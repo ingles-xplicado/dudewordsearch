@@ -2,1716 +2,2636 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta
-  name="viewport"
-  content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover"
->
-<meta name="theme-color" content="#1976d2">
-<title>Dude Word Search</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Ghost Word</title>
+
+<script src="https://cdn.jsdelivr.net/npm/peerjs@1.5.5/dist/peerjs.min.js"></script>
 
 <style>
-:root {
-  --blue: #1976d2;
-  --blue-dark: #0d47a1;
-  --blue-light: #72baff;
-  --yellow: #ffd400;
-  --black: #111111;
-  --page: #f4f5f7;
-  --card: #ffffff;
-  --soft: #eef6ff;
-  --text: #171717;
-  --muted: #666666;
-  --border: #111111;
+*{box-sizing:border-box}
+
+body{
+  margin:0;
+  min-height:100vh;
+  padding:18px;
+  font-family:Arial,sans-serif;
+  background:radial-gradient(circle at top,#292947,#11111e 48%,#090910);
+  color:#f7f7fc
 }
 
-* { box-sizing: border-box; }
+button,input{font:inherit}
 
-html {
-  background: var(--page);
-  -webkit-text-size-adjust: 100%;
+.app{
+  width:min(760px,100%);
+  margin:auto
 }
 
-body {
-  margin: 0;
-  color: var(--text);
-  font-family:
-    ui-rounded,
-    "SF Pro Rounded",
-    -apple-system,
-    BlinkMacSystemFont,
-    "Segoe UI",
-    sans-serif;
-  background:
-    radial-gradient(
-      circle at top left,
-      rgba(114, 186, 255, 0.65) 0%,
-      transparent 28rem
-    ),
-    radial-gradient(
-      circle at bottom right,
-      rgba(255, 212, 0, 0.36) 0%,
-      transparent 24rem
-    ),
-    var(--page);
-  overscroll-behavior-y: contain;
+.shell{
+  background:#141423;
+  border:1px solid #ffffff17;
+  border-radius:24px;
+  padding:22px
 }
 
-main {
-  width: min(100%, 900px);
-  margin: 0 auto;
-  padding: 24px 12px 50px;
+.head{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:14px
 }
 
-/* HEADER */
-.top {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-end;
-  gap: 16px;
-  flex-wrap: wrap;
-  margin-bottom: 18px;
+.head h1{
+  margin:0;
+  font-size:clamp(32px,7vw,48px);
+  letter-spacing:2px
 }
 
-.kicker {
-  color: var(--blue-dark);
-  font-size: 0.78rem;
-  font-weight: 950;
-  letter-spacing: 0.17em;
-  text-transform: uppercase;
+.sub,.small{color:#9b9bb3}
+
+.sub{margin-top:6px}
+
+.ghost{font-size:46px}
+
+.hidden{display:none!important}
+
+.card,.stat{
+  background:#1b1b30;
+  border:1px solid #ffffff17;
+  border-radius:14px
 }
 
-h1 {
-  margin: 6px 0 0;
-  color: var(--black);
-  font-size: clamp(2.2rem, 9vw, 4rem);
-  line-height: 0.95;
-  letter-spacing: -0.05em;
+.card{
+  margin-top:18px;
+  padding:16px
 }
 
-.main-logo {
-  display: block;
-  width: min(100%, 560px);
-  height: auto;
-  margin: 6px 0 8px;
-  object-fit: contain;
-  object-position: left center;
-
-  border-bottom: 3px solid var(--blue);
-  padding-bottom: 10px;
+.card h2,.section h2{
+  margin:0 0 11px;
+  font-size:15px;
+  letter-spacing:.7px;
+  text-transform:uppercase
 }
 
-.badges {
-  display: flex;
-  gap: 6px;
-  flex-wrap: wrap;
-  margin-top: 12px;
+.small{
+  font-size:12px;
+  line-height:1.5
 }
 
-.puzzle-number,
-.theme {
-  display: inline-block;
-  padding: 6px 10px;
-  border: 2px solid var(--black);
-  border-radius: 10px;
-  font-size: 0.85rem;
-  font-weight: 900;
+.row{
+  display:flex;
+  gap:10px
 }
 
-.puzzle-number {
-  background: var(--black);
-  color: white;
+.grow{
+  flex:1;
+  min-width:0
 }
 
-.theme {
-  background: var(--yellow);
-  color: var(--black);
+.btn{
+  min-height:48px;
+  border:0;
+  border-radius:12px;
+  padding:12px 16px;
+  background:#2a2a43;
+  color:white;
+  font-weight:900;
+  cursor:pointer
 }
 
-.description {
-  max-width: 650px;
-  margin: 10px 0 0;
-  color: var(--muted);
-  font-size: 1rem;
-  line-height: 1.5;
+.btn.primary{background:#7063e6}
+
+.btn.danger{background:#572833}
+
+.btn:disabled{
+  opacity:.4;
+  cursor:default
 }
 
-/* CATEGORY PICKER */
-.category-bar {
-  margin-bottom: 16px;
-  padding: 13px;
-  border: 3px solid var(--black);
-  border-radius: 18px;
-  background: white;
-  box-shadow: 0 5px 0 var(--black);
+.input{
+  width:100%;
+  min-height:50px;
+  border-radius:12px;
+  border:1px solid #3a3a55;
+  background:#0f0f1b;
+  color:white;
+  padding:13px 14px;
+  font-size:17px;
+  outline:none
 }
 
-.category-label {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  gap: 9px;
-  margin-bottom: 10px;
-  color: var(--black);
-  font-size: 0.82rem;
-  font-weight: 950;
-  letter-spacing: 0.12em;
-  text-align: center;
-  text-transform: uppercase;
+.input:focus{border-color:#8678f3}
+
+.upper{
+  text-transform:uppercase;
+  letter-spacing:2px
 }
 
-select {
-  width: 100%;
-  min-height: 50px;
-  padding: 0 42px 0 14px;
-  border: 3px solid var(--black);
-  border-radius: 14px;
-  background: var(--blue-light);
-  color: var(--black);
-  font: inherit;
-  font-size: 1rem;
-  font-weight: 900;
-  box-shadow: 0 4px 0 var(--black);
-  cursor: pointer;
+.roomcode{
+  text-align:center;
+  font-size:clamp(34px,10vw,52px);
+  font-weight:950;
+  letter-spacing:8px;
+  margin:6px 0
 }
 
-/* BUTTONS */
-.buttons {
-  display: flex;
-  gap: 9px;
-  flex-wrap: wrap;
+.center{text-align:center}
+
+.connection{
+  margin-top:10px;
+  text-align:center;
+  color:#9b9bb3;
+  font-size:12px
 }
 
-button {
-  min-height: 46px;
-  padding: 0 16px;
-  border: 3px solid var(--black);
-  border-radius: 15px;
-  background: white;
-  color: var(--black);
-  font: inherit;
-  font-weight: 900;
-  box-shadow: 0 4px 0 var(--black);
-  cursor: pointer;
-  touch-action: manipulation;
-  -webkit-tap-highlight-color: transparent;
+.dot{
+  display:inline-block;
+  width:8px;
+  height:8px;
+  border-radius:50%;
+  margin-right:6px;
+  background:#ffd36f
 }
 
-button.primary {
-  background: var(--yellow);
-  color: var(--black);
+.dot.online{background:#5de38d}
+
+.stats{
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:8px;
+  margin-top:18px
 }
 
-button:active {
-  transform: translateY(2px);
-  box-shadow: 0 2px 0 var(--black);
+.stat{
+  text-align:center;
+  padding:11px 6px
 }
 
-/* LAYOUT */
-.layout {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) 230px;
-  gap: 16px;
-  align-items: start;
+.stat strong{
+  display:block;
+  font-size:19px
 }
 
-.card {
-  padding: 12px;
-  border: 3px solid var(--black);
-  border-radius: 22px;
-  background: white;
-  box-shadow: 0 5px 0 var(--black);
+.stat span{
+  display:block;
+  color:#9b9bb3;
+  font-size:9px;
+  margin-top:4px;
+  text-transform:uppercase
 }
 
-/* 12 ACROSS x 13 DOWN */
-.grid-wrapper {
-  width: 100%;
-  display: flex;
-  justify-content: center;
+.status{
+  margin-top:14px;
+  padding:13px;
+  border-radius:12px;
+  background:#202037;
+  font-weight:800;
+  line-height:1.4
 }
 
-#grid {
-  display: grid;
-  grid-template-columns: repeat(12, minmax(0, 1fr));
-  gap: 3px;
-  width: min(100%, 580px);
-  padding: 8px;
-  border: 3px solid var(--black);
-  border-radius: 18px;
-  background: var(--blue-light);
-  touch-action: none;
-  overscroll-behavior: none;
-  user-select: none;
-  -webkit-user-select: none;
-  -webkit-touch-callout: none;
+.status.good{
+  background:#173f2d;
+  color:#98ffc0
 }
 
-.cell {
-  aspect-ratio: 1 / 1;
-  min-width: 0;
-  display: grid;
-  place-items: center;
-  border: 1px solid rgba(17, 17, 17, 0.18);
-  border-radius: 8px;
-  background: white;
-  color: var(--black);
-  font-size: clamp(0.88rem, 4.1vw, 1.35rem);
-  font-weight: 950;
-  line-height: 1;
-  transition:
-    background 0.10s ease,
-    color 0.10s ease,
-    transform 0.08s ease,
-    box-shadow 0.10s ease;
+.status.bad{
+  background:#47222b;
+  color:#ffb2bf
 }
 
-.cell.preview {
-  background: var(--blue);
-  color: white;
-  box-shadow: inset 0 0 0 2px var(--black);
-  transform: scale(1.04);
+.status.force{
+  background:#4b391b;
+  color:#ffe4a2
 }
 
-.cell.found {
-  background: var(--yellow);
-  color: var(--black);
-  border-color: var(--black);
-  box-shadow: inset 0 0 0 2px var(--black);
+.rules{
+  margin-top:10px;
+  padding:10px 12px;
+  border-radius:10px;
+  background:#19192a;
+  color:#b6b6c9;
+  font-size:12px
 }
 
-/* STATUS */
-.status {
-  min-height: 52px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 10px;
-  flex-wrap: wrap;
-  padding: 12px 5px 0;
-  color: var(--muted);
+.section{
+  margin-top:20px;
+  padding-top:18px;
+  border-top:1px solid #ffffff17
 }
 
-.status strong {
-  color: var(--black);
-  font-weight: 950;
+.keyboard{
+  display:grid;
+  grid-template-columns:repeat(7,1fr);
+  gap:8px
 }
 
-#message {
-  color: var(--black);
-  font-weight: 900;
+.key{
+  min-height:46px;
+  border:1px solid transparent;
+  border-radius:11px;
+  background:#2a2a43;
+  color:white;
+  font-weight:900;
+  cursor:pointer
 }
 
-#message.good {
-  color: var(--blue-dark);
+.key:disabled{
+  opacity:.34;
+  cursor:default
 }
 
-.win {
-  display: none;
-  margin-top: 8px;
-  padding: 14px;
-  border: 3px solid var(--black);
-  border-radius: 14px;
-  background: var(--yellow);
-  color: var(--black);
-  box-shadow: 0 4px 0 var(--black);
-  font-weight: 950;
-  text-align: center;
+.key.good{
+  background:#1e5d3e;
+  color:#98ffc0;
+  border-color:#3d9065;
+  opacity:1
 }
 
-.win.show { display: block; }
-
-/* WORD LIST */
-.side h2 {
-  margin: 2px 0 12px;
-  color: var(--black);
-  font-size: 1.05rem;
+.key.bad{
+  background:#612d3a;
+  color:#ffb2bf;
+  border-color:#914556;
+  opacity:1
 }
 
-#wordList {
-  display: grid;
-  gap: 8px;
+.learned{
+  display:flex;
+  flex-wrap:wrap;
+  gap:8px;
+  min-height:32px
 }
 
-.word {
-  min-height: 42px;
-  display: flex;
-  align-items: center;
-  padding: 8px 10px;
-  border: 2px solid var(--black);
-  border-radius: 11px;
-  background: var(--blue-light);
-  color: var(--black);
-  box-shadow: 0 3px 0 var(--black);
-  font-weight: 900;
-  letter-spacing: 0.03em;
+.pill{
+  padding:8px 11px;
+  border-radius:999px;
+  font-size:14px;
+  font-weight:900
 }
 
-.word.found {
-  background: var(--yellow);
-  color: var(--black);
-  border-color: var(--black);
-  text-decoration: line-through 2px;
+.pill.good{
+  background:#173f2d;
+  color:#98ffc0
 }
 
-.tip {
-  margin: 13px 2px 2px;
-  color: var(--muted);
-  font-size: 0.84rem;
-  line-height: 1.45;
+.pill.bad{
+  background:#47222b;
+  color:#ffb2bf
 }
 
-/* MOBILE */
-@media (max-width: 720px) {
-  .layout { grid-template-columns: 1fr; }
-
-  #wordList {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
+.guess{
+  font-size:20px;
+  text-transform:uppercase;
+  letter-spacing:2px
 }
 
-@media (max-width: 390px) {
-  main {
-    padding-left: 8px;
-    padding-right: 8px;
+.history{
+  display:grid;
+  gap:8px
+}
+
+.history-row{
+  display:flex;
+  justify-content:space-between;
+  gap:12px;
+  padding:10px 12px;
+  border-radius:10px;
+  background:#1a1a2d
+}
+
+.error{
+  margin-top:14px;
+  padding:12px;
+  border-radius:12px;
+  background:#47222b;
+  color:#ffb2bf;
+  font-weight:800;
+  font-size:13px
+}
+
+.secretwrap{
+  position:relative
+}
+
+.secretwrap .input{
+  padding-right:82px
+}
+
+.show{
+  position:absolute;
+  right:7px;
+  top:7px;
+  bottom:7px;
+  border:0;
+  border-radius:9px;
+  background:#292942;
+  color:white;
+  font-weight:800;
+  padding:0 10px
+}
+
+.note{
+  margin-top:10px;
+  padding:10px 12px;
+  border-radius:10px;
+  background:#161629;
+  color:#aaaac0;
+  font-size:12px;
+  line-height:1.4
+}
+
+@media(max-width:560px){
+  .stats{
+    grid-template-columns:repeat(2,1fr)
   }
 
-  .card { padding: 9px; }
-
-  #grid {
-    padding: 6px;
-    gap: 2px;
+  .keyboard{
+    grid-template-columns:repeat(6,1fr)
   }
 
-  .cell {
-    border-radius: 6px;
-    font-size: clamp(0.82rem, 4vw, 1.15rem);
+  .mobile{
+    flex-direction:column
   }
 
-  .word { font-size: 0.9rem; }
-}
-
-/* ======================================================
-   DECORATIVE LETTER BACKGROUND
-   Subtle blue / yellow / black letter graffiti
-====================================================== */
-
-body {
-  position: relative;
-  overflow-x: hidden;
-}
-
-.letter-bg {
-  position: fixed;
-  inset: 0;
-  z-index: 0;
-  overflow: hidden;
-  pointer-events: none;
-  user-select: none;
-}
-
-.letter-bg .bg-letter {
-  position: absolute;
-  font-weight: 950;
-  line-height: 1;
-  opacity: 0.10;
-  filter: saturate(1.05);
-}
-
-.letter-bg .blue {
-  color: var(--blue);
-}
-
-.letter-bg .yellow {
-  color: var(--yellow);
-  -webkit-text-stroke: 1px rgba(17, 17, 17, 0.22);
-}
-
-.letter-bg .black {
-  color: var(--black);
-}
-
-/* LEFT SIDE */
-.letter-bg .b1  { left: 2%;  top: 7%;  font-size: 88px;  transform: rotate(-18deg); }
-.letter-bg .b2  { left: 10%; top: 20%; font-size: 52px;  transform: rotate(24deg); }
-.letter-bg .b3  { left: 3%;  top: 39%; font-size: 112px; transform: rotate(176deg); }
-.letter-bg .b4  { left: 13%; top: 57%; font-size: 62px;  transform: rotate(-33deg); }
-.letter-bg .b5  { left: 4%;  top: 75%; font-size: 96px;  transform: rotate(14deg); }
-.letter-bg .b6  { left: 16%; top: 88%; font-size: 48px;  transform: rotate(190deg); }
-
-/* RIGHT SIDE */
-.letter-bg .b7  { right: 3%;  top: 10%; font-size: 82px;  transform: rotate(17deg); }
-.letter-bg .b8  { right: 12%; top: 27%; font-size: 54px;  transform: rotate(182deg); }
-.letter-bg .b9  { right: 2%;  top: 45%; font-size: 106px; transform: rotate(-16deg); }
-.letter-bg .b10 { right: 14%; top: 63%; font-size: 58px;  transform: rotate(31deg); }
-.letter-bg .b11 { right: 4%;  top: 80%; font-size: 92px;  transform: rotate(184deg); }
-.letter-bg .b12 { right: 17%; top: 92%; font-size: 46px;  transform: rotate(-22deg); }
-
-/* A FEW SMALLER ONES CLOSER TO THE CENTER EDGES */
-.letter-bg .b13 { left: 21%;  top: 12%; font-size: 40px; transform: rotate(181deg); }
-.letter-bg .b14 { right: 22%; top: 18%; font-size: 42px; transform: rotate(-27deg); }
-.letter-bg .b15 { left: 20%;  top: 68%; font-size: 44px; transform: rotate(12deg); }
-.letter-bg .b16 { right: 20%; top: 71%; font-size: 44px; transform: rotate(188deg); }
-.letter-bg .b17 { left: 24%;  top: 94%; font-size: 38px; transform: rotate(-15deg); }
-.letter-bg .b18 { right: 24%; top: 38%; font-size: 38px; transform: rotate(23deg); }
-
-main {
-  position: relative;
-  z-index: 1;
-}
-
-/* Keep phones cleaner than desktop */
-@media (max-width: 720px) {
-  .letter-bg .bg-letter {
-    opacity: 0.055;
+  .mobile>*{
+    width:100%
   }
-
-  .letter-bg .b2,
-  .letter-bg .b4,
-  .letter-bg .b6,
-  .letter-bg .b8,
-  .letter-bg .b10,
-  .letter-bg .b12,
-  .letter-bg .b13,
-  .letter-bg .b14,
-  .letter-bg .b15,
-  .letter-bg .b16,
-  .letter-bg .b17,
-  .letter-bg .b18 {
-    display: none;
-  }
-
-  .letter-bg .b1,
-  .letter-bg .b3,
-  .letter-bg .b5,
-  .letter-bg .b7,
-  .letter-bg .b9,
-  .letter-bg .b11 {
-    font-size: 58px;
-  }
-
-  .letter-bg .b1 { left: -1%; }
-  .letter-bg .b3 { left: -3%; }
-  .letter-bg .b5 { left: -2%; }
-
-  .letter-bg .b7 { right: -1%; }
-  .letter-bg .b9 { right: -3%; }
-  .letter-bg .b11 { right: -2%; }
 }
-
 </style>
 </head>
 
 <body>
 
-<div class="letter-bg" aria-hidden="true">
-  <span class="bg-letter blue b1">A</span>
-  <span class="bg-letter yellow b2">R</span>
-  <span class="bg-letter black b3">Q</span>
-  <span class="bg-letter blue b4">M</span>
-  <span class="bg-letter yellow b5">K</span>
-  <span class="bg-letter black b6">S</span>
+<div class="app">
+<main class="shell">
 
-  <span class="bg-letter yellow b7">B</span>
-  <span class="bg-letter black b8">X</span>
-  <span class="bg-letter blue b9">T</span>
-  <span class="bg-letter yellow b10">N</span>
-  <span class="bg-letter black b11">W</span>
-  <span class="bg-letter blue b12">Z</span>
+<div class="head">
+  <div>
+    <h1>GHOST WORD</h1>
+    <div class="sub">Two-player hidden-word deduction.</div>
+  </div>
 
-  <span class="bg-letter black b13">D</span>
-  <span class="bg-letter blue b14">U</span>
-  <span class="bg-letter yellow b15">D</span>
-  <span class="bg-letter black b16">E</span>
-  <span class="bg-letter blue b17">Y</span>
-  <span class="bg-letter yellow b18">J</span>
+  <div class="ghost">👻</div>
 </div>
 
-<main>
+<section id="home">
 
-<section class="top">
-  <div>
-    <div id="kicker" class="kicker">Find the beers</div>
-
-    <img
-      src="./ffff.png"
-      alt="Dude Word Search"
-      class="main-logo"
-    >
-
-    <div class="badges">
-      <span id="theme" class="theme">&#x1F37A; Beer Names</span>
-    </div>
-
-    <p id="description" class="description">
-      Drag finger across the hidden words. Clicking "shuffle board" makes the letters
-      rearrange so each puzzle can be solved differently multiple times. 
-    </p>
-  </div>
-
-  <div class="buttons">
-    <button id="newPuzzle" class="primary" type="button">
-      Shuffle Board
-    </button>
-
-    <button id="resetPuzzle" type="button">
-      Reset
-    </button>
-  </div>
-</section>
-
-<section class="category-bar">
-  <label class="category-label" for="categorySelect">
-  ⬇️ Choose a Puzzle ⬇️
-</label>
-
-  <select id="categorySelect">
-    <option value="beer">&#x1F37A; Beer Names</option>
-    <option value="football">&#x1F3C8; Football Teams</option>
-    <option value="tools">&#x1F6E0;&#xFE0F; Tools</option>
-    <option value="trucks">&#x1F69A; Trucks</option>
-    <option value="grillbbq">&#x1F969; Grill &amp; BBQ</option>
-    <option value="dadstuff">&#x1F468; Dad Stuff</option>
-    <option value="rockbands">&#x1F3B8; Rock Bands</option>
-    <option value="fishing">&#x1F3A3; Fishing</option>
-  </select>
-</section>
-
-<section class="layout">
   <div class="card">
-    <div class="grid-wrapper">
-      <div id="grid" aria-label="Word search grid"></div>
+    <h2>Create a room</h2>
+
+    <div class="small">
+      You host the game and choose the secret word.
     </div>
 
-    <div class="status" aria-live="polite">
-      <div>
-        <strong id="score">0 / 9</strong>
-        found
+    <button
+      id="create"
+      class="btn primary"
+      style="width:100%;margin-top:12px"
+    >
+      CREATE ROOM
+    </button>
+  </div>
+
+  <div class="card">
+    <h2>Join a room</h2>
+
+    <div class="row mobile">
+
+      <input
+        id="joinCode"
+        class="input upper grow"
+        maxlength="6"
+        placeholder="ROOM CODE"
+      >
+
+      <button id="join" class="btn">
+        JOIN ROOM
+      </button>
+
+    </div>
+  </div>
+
+  <div id="homeError" class="error hidden"></div>
+
+</section>
+
+<section id="room" class="hidden">
+
+  <div class="card">
+
+    <div id="role" class="center small"></div>
+
+    <div id="roomCode" class="roomcode">
+      ------
+    </div>
+
+    <div class="row mobile">
+
+      <button id="copyCode" class="btn grow">
+        COPY CODE
+      </button>
+
+      <button id="copyLink" class="btn grow">
+        COPY INVITE LINK
+      </button>
+
+      <button id="leave" class="btn danger">
+        LEAVE
+      </button>
+
+    </div>
+
+    <div id="connection" class="connection">
+      <span class="dot"></span>
+      Connecting...
+    </div>
+
+  </div>
+
+  <div id="hostPanel" class="card hidden">
+
+    <h2>Choose the Ghost Word</h2>
+
+    <div id="hostSetup">
+
+      <div class="secretwrap">
+
+        <input
+          id="secret"
+          class="input upper"
+          type="password"
+          maxlength="16"
+          placeholder="SECRET WORD"
+        >
+
+        <button id="show" class="show">
+          SHOW
+        </button>
+
       </div>
 
-      <div id="message">Find a word. &#x1F50E;</div>
+      <div class="small" style="margin-top:8px">
+        4–16 letters. Longer words, around 7–10 letters, usually play best.
+      </div>
+
+      <button
+        id="start"
+        class="btn primary"
+        style="width:100%;margin-top:12px"
+      >
+        START GAME
+      </button>
+
     </div>
 
-    <div id="win" class="win"></div>
+    <div id="hostActive" class="hidden">
+
+      <div class="note">
+        The secret word stays only in the host browser.
+        The guesser never receives it.
+      </div>
+
+      <div style="margin-top:10px">
+        <strong>Word length:</strong>
+        <span id="hostLen">—</span>
+      </div>
+
+      <button
+        id="newWord"
+        class="btn"
+        style="width:100%;margin-top:12px"
+      >
+        START A NEW WORD
+      </button>
+
+    </div>
+
   </div>
 
-  <aside class="card side">
-    <h2>Find These</h2>
-    <div id="wordList"></div>
+  <div id="game" class="hidden">
 
-    <p class="tip">
-      Words can run in all eight directions.<br><br>
-      Every new board scrambles the locations again.
-    </p>
-  </aside>
+    <div class="stats">
+
+      <div class="stat">
+        <strong id="lenStat">—</strong>
+        <span>Word length</span>
+      </div>
+
+      <div class="stat">
+        <strong id="scanStat">0 / —</strong>
+        <span>Scans this round</span>
+      </div>
+
+      <div class="stat">
+        <strong id="correctStat">0 / —</strong>
+        <span>Correct this round</span>
+      </div>
+
+      <div class="stat">
+        <strong id="guessStat">0</strong>
+        <span>Word guesses</span>
+      </div>
+
+    </div>
+
+    <div id="rules" class="rules"></div>
+
+    <div id="message" class="status"></div>
+
+    <div id="guesser" class="hidden">
+
+      <div class="section">
+
+        <h2>Scan a letter</h2>
+
+        <div id="keyboard" class="keyboard"></div>
+
+      </div>
+
+      <div class="section">
+
+        <h2>What you know</h2>
+
+        <div id="learned" class="learned"></div>
+
+      </div>
+
+      <div id="guessArea" class="section hidden">
+
+        <h2>Make your one word guess</h2>
+
+        <input
+          id="wordGuess"
+          class="input guess"
+          autocomplete="off"
+          autocapitalize="characters"
+          spellcheck="false"
+        >
+
+        <div
+          id="commitText"
+          class="small"
+          style="margin-top:8px"
+        ></div>
+
+      </div>
+
+    </div>
+
+    <div id="hostWatch" class="section hidden">
+
+      <h2>Guesser progress</h2>
+
+      <div id="hostLearned" class="learned"></div>
+
+    </div>
+
+    <div id="historySection" class="section hidden">
+
+      <h2>Word guesses</h2>
+
+      <div id="history" class="history"></div>
+
+    </div>
+
+  </div>
+
 </section>
 
 </main>
+</div>
 
 <script>
-(() => {
+(()=>{
+"use strict";
 
-/* =====================================================
-   PUZZLE CATEGORIES
-===================================================== */
 
-const PUZZLES = [
-  {
-  id: "beer",
-  theme: "\u{1F37A} Beer Names",
-  kicker: "Find the beers",
-  foundEmoji: "\u{1F37A}",
-  winMessage: "\u{1F37A} Cheers. You found them all.",
-  words: [
-    { label: "BUDWEISER", key: "BUDWEISER" },
-    { label: "COORS", key: "COORS" },
-    { label: "MODELO", key: "MODELO" },
-    { label: "CORONA", key: "CORONA" },
-    { label: "HEINEKEN", key: "HEINEKEN" },
-    { label: "MILLER", key: "MILLER" },
-    { label: "GUINNESS", key: "GUINNESS" },
-    { label: "MICHELOB", key: "MICHELOB" },
-    { label: "BUSCH", key: "BUSCH" },
-    { label: "FOURLOKO", key: "FOURLOKO" }
-  ],
-  embeddedWords: []
-},
-  
-  {
+// ============================================================
+// ADAPTIVE DIFFICULTY
+// ============================================================
 
-  id: "tools",
-  theme: "\u{1F6E0}\u{FE0F} Tools",
-  kicker: "Find the tools",
-  foundEmoji: "\u{1F6E0}\u{FE0F}",
-  winMessage: "\u{1F6E0}\u{FE0F} Toolbox cleared. You found them all.",
-  words: [
-    { label: "HAMMER", key: "HAMMER" },
-    { label: "WRENCH", key: "WRENCH" },
-    { label: "DRILLBIT", key: "DRILLBIT" }, 
-    { label: "PLIERS", key: "PLIERS" },
-    { label: "SOCKET", key: "SOCKET" },
-    { label: "RATCHET", key: "RATCHET" },
-    { label: "CHISEL", key: "CHISEL" },
-    { label: "LEVEL", key: "LEVEL" },
-    { label: "CLAMP", key: "CLAMP" },
-    { label: "TOOLBOX", key: "TOOLBOX" },
-    { label: "SCREWDRIVER", key: "SCREWDRIVER" }
+function getRules(n){
 
-  ],
-
-  embeddedWords: []
-
-},
-
-  {
-  id: "trucks",
-  theme: "\u{1F69A} Trucks",
-  kicker: "Find the truck names",
-  foundEmoji: "\u{1F69A}",
-  winMessage: "\u{1F69A} Truck puzzle cleared. You found them all.",
-     words: [
-    { label: "KING RANCH", key: "KINGRANCH" },
-    { label: "SILVERADO", key: "SILVERADO" },
-    { label: "TITAN", key: "TITAN" },
-    { label: "CHEVROLET", key: "CHEVROLET" },
-    { label: "FORD", key: "FORD" },
-    { label: "HEAVY DUTY", key: "HEAVYDUTY" },
-    { label: "CUMMINS", key: "CUMMINS" },
-    { label: "DIESEL", key: "DIESEL" },
-    { label: "MUD TIRES", key: "MUDTIRES" },
-    { label: "FOUR BY FOUR", key: "FOURBYFOUR" },
-    { label: "BED LINER", key: "BEDLINER" }
-  ],
-  embeddedWords: []
-},
-
-  {
-  id: "grillbbq",
-  theme: "\u{1F969} Grill & BBQ",
-  kicker: "Find the grill words",
-  foundEmoji: "\u{1F969}",
-  winMessage: "\u{1F969} Grill cleared. You found them all.",
-  words: [
-    { label: "BRISKET", key: "BRISKET" },
-    { label: "RIBEYE", key: "RIBEYE" },
-    { label: "BURGER", key: "BURGER" },
-    { label: "RIBS", key: "RIBS" },
-    { label: "BACON", key: "BACON" },
-    { label: "SMOKER", key: "SMOKER" },
-    { label: "CHARCOAL", key: "CHARCOAL" },
-    { label: "PROPANE", key: "PROPANE" },
-    { label: "TONGS", key: "TONGS" },
-    { label: "SAUSAGE", key: "SAUSAGE" },
-    { label: "PORTERHOUSE", key: "PORTERHOUSE" }
-  ],
-  embeddedWords: []
-},
-
-  {
-  id: "dadstuff",
-  theme: "\u{1F468} Dad Stuff",
-  kicker: "Find the dad stuff",
-  foundEmoji: "\u{1F468}",
-  winMessage: "\u{1F468} Dad mode complete. You found them all.",
-  words: [
-    { label: "THERMOSTAT", key: "THERMOSTAT" },
-    { label: "LAWNMOWER", key: "LAWNMOWER" },
-    { label: "GARAGE", key: "GARAGE" },
-    { label: "FLASHLIGHT", key: "FLASHLIGHT" },
-    { label: "REMOTE", key: "REMOTE" },
-    { label: "LEFTOVERS", key: "LEFTOVERS" },
-    { label: "GRILL", key: "GRILL" },
-    { label: "COFFEE", key: "COFFEE" },
-    { label: "NAP", key: "NAP" },
-    { label: "MORTGAGE", key: "MORTGAGE" },
-    { label: "BODY ACHES", key: "BODYACHES" }
-  ],
-  embeddedWords: []
-},
-
-  {
-  id: "rockbands",
-  theme: "\u{1F3B8} Rock Bands",
-  kicker: "Find the rock bands",
-  foundEmoji: "\u{1F3B8}",
-  winMessage: "\u{1F3B8} Rock on. You found them all.",
-  words: [
-    { label: "METALLICA", key: "METALLICA" },
-    { label: "NIRVANA", key: "NIRVANA" },
-    { label: "PANTERA", key: "PANTERA" },
-    { label: "SLAYER", key: "SLAYER" },
-    { label: "KORN", key: "KORN" },
-    { label: "TOOL", key: "TOOL" },
-    { label: "RUSH", key: "RUSH" },
-    { label: "QUEEN", key: "QUEEN" },
-    { label: "AEROSMITH", key: "AEROSMITH" },
-    { label: "SLIPKNOT", key: "SLIPKNOT" },
-    { label: "MEGADETH", key: "MEGADETH" }
-  ],
-  embeddedWords: []
-},
-
-  {
-  id: "fishing",
-  theme: "\u{1F3A3} Fishing",
-  kicker: "Find the fishing words",
-  foundEmoji: "\u{1F3A3}",
-  winMessage: "\u{1F3A3} Nice catch. You found them all.",
-  words: [
-    { label: "BASS", key: "BASS" },
-    { label: "TROUT", key: "TROUT" },
-    { label: "CATFISH", key: "CATFISH" },
-    { label: "BOBBER", key: "BOBBER" },
-    { label: "FISHING LINE", key: "FISHINGLINE" },
-    { label: "HOOK", key: "HOOK" },
-    { label: "BAIT", key: "BAIT" },
-    { label: "LURE", key: "LURE" },
-    { label: "REEL", key: "REEL" },
-    { label: "TACKLE BOX", key: "TACKLEBOX" },
-    { label: "JON BOAT", key: "JONBOAT" },
-    { label: "TROLLING", key: "TROLLING" }
-  ],
-  embeddedWords: []
-},
-  
-  {
-    id: "football",
-    theme: "\u{1F3C8} Football Teams",
-    kicker: "Find the teams",
-    foundEmoji: "\u{1F3C8}",
-    winMessage: "\u{1F3C8} Touchdown. You found every team.",
-    words: [
-      { label: "BENGALS", key: "BENGALS" },
-      { label: "RAMS", key: "RAMS" },
-      { label: "BROWNS", key: "BROWNS" },
-      { label: "CHIEFS", key: "CHIEFS" },
-      { label: "PATRIOTS", key: "PATRIOTS" },
-      { label: "PANTHERS", key: "PANTHERS" },
-      { label: "FALCONS", key: "FALCONS" },
-      { label: "BRONCOS", key: "BRONCOS" },
-      { label: "RAIDERS", key: "RAIDERS" },
-      { label: "DOLPHINS", key: "DOLPHINS" }
-    ],
-    embeddedWords: []
-  }
-];
-
-/* =====================================================
-   BOARD SETTINGS
-===================================================== */
-
-const ROWS = 13;
-const COLS = 12;
-
-const DIRECTIONS = [
-  [-1, -1],
-  [-1, 0],
-  [-1, 1],
-  [0, -1],
-  [0, 1],
-  [1, -1],
-  [1, 0],
-  [1, 1]
-];
-
-/*
-  Four physical directions are enough when checking
-  duplicates because each line is also checked reversed.
-*/
-const CHECK_DIRECTIONS = [
-  [0, 1],
-  [1, 0],
-  [1, 1],
-  [1, -1]
-];
-
-const FILLER_LETTERS =
-  "EEEEEEEEEEEE" +
-  "TTTTTTTTTT" +
-  "AAAAAAAAA" +
-  "OOOOOOOO" +
-  "IIIIIIII" +
-  "NNNNNNNN" +
-  "SSSSSSS" +
-  "HHHHHH" +
-  "RRRRRR" +
-  "DDDDD" +
-  "LLLLL" +
-  "UUUU" +
-  "CCCC" +
-  "MMMM" +
-  "FFFF" +
-  "WWWW" +
-  "YYYY" +
-  "GGG" +
-  "PPP" +
-  "BBB" +
-  "VV" +
-  "KK" +
-  "J" +
-  "X" +
-  "Q" +
-  "Z";
-
-/* =====================================================
-   ELEMENTS
-===================================================== */
-
-const grid = document.getElementById("grid");
-const wordList = document.getElementById("wordList");
-const score = document.getElementById("score");
-const message = document.getElementById("message");
-const win = document.getElementById("win");
-const theme = document.getElementById("theme");
-const kicker = document.getElementById("kicker");
-const categorySelect = document.getElementById("categorySelect");
-const newPuzzleButton = document.getElementById("newPuzzle");
-const resetButton = document.getElementById("resetPuzzle");
-
-/* =====================================================
-   STATE
-===================================================== */
-
-let currentPuzzleIndex = 0;
-let board = [];
-let placements = new Map();
-let foundWords = new Set();
-let dragging = false;
-let startCell = null;
-let currentPath = [];
-let activeTouchID = null;
-
-/* =====================================================
-   BASIC HELPERS
-===================================================== */
-
-function getCurrentPuzzle() {
-  return PUZZLES[currentPuzzleIndex];
-}
-
-function randomNumber(max) {
-  return Math.floor(Math.random() * max);
-}
-
-function randomFillerLetter() {
-  return FILLER_LETTERS[randomNumber(FILLER_LETTERS.length)];
-}
-
-function shuffle(array) {
-  const copy = [...array];
-
-  for (let i = copy.length - 1; i > 0; i--) {
-    const j = randomNumber(i + 1);
-    [copy[i], copy[j]] = [copy[j], copy[i]];
+  if(n<=4){
+    return{
+      maxScans:4,
+      maxCorrect:2
+    };
   }
 
-  return copy;
-}
-
-function emptyBoard() {
-  return Array.from(
-    { length: ROWS },
-    () => Array(COLS).fill("")
-  );
-}
-
-/* =====================================================
-   PLACEMENT CANDIDATES
-===================================================== */
-
-function getCandidates(key, direction, puzzleBoard, existingPlacements) {
-  const rowDirection = direction[0];
-  const columnDirection = direction[1];
-  const candidates = [];
-
-  for (let row = 0; row < ROWS; row++) {
-    for (let column = 0; column < COLS; column++) {
-      const endRow = row + rowDirection * (key.length - 1);
-      const endColumn = column + columnDirection * (key.length - 1);
-
-      if (
-        endRow < 0 ||
-        endRow >= ROWS ||
-        endColumn < 0 ||
-        endColumn >= COLS
-      ) {
-        continue;
-      }
-
-      let valid = true;
-      let crossings = 0;
-      let edgeCells = 0;
-      let centerDistance = 0;
-      const path = [];
-
-      for (let index = 0; index < key.length; index++) {
-        const r = row + rowDirection * index;
-        const c = column + columnDirection * index;
-        const existing = puzzleBoard[r][c];
-
-        if (existing !== "" && existing !== key[index]) {
-          valid = false;
-          break;
-        }
-
-        if (existing === key[index]) {
-          crossings++;
-        }
-
-        if (
-          r === 0 ||
-          c === 0 ||
-          r === ROWS - 1 ||
-          c === COLS - 1
-        ) {
-          edgeCells++;
-        }
-
-        centerDistance +=
-          Math.abs(r - (ROWS - 1) / 2) +
-          Math.abs(c - (COLS - 1) / 2);
-
-        path.push([r, c]);
-      }
-
-      if (!valid) {
-        continue;
-      }
-
-      let spreadScore = 0;
-
-      if (existingPlacements.size > 0) {
-        const middle = path[Math.floor(path.length / 2)];
-        let nearest = Infinity;
-
-        for (const placedPath of existingPlacements.values()) {
-          if (!placedPath || placedPath.length === 0) {
-            continue;
-          }
-
-          const placedMiddle =
-            placedPath[Math.floor(placedPath.length / 2)];
-
-          const distance =
-            Math.abs(middle[0] - placedMiddle[0]) +
-            Math.abs(middle[1] - placedMiddle[1]);
-
-          nearest = Math.min(nearest, distance);
-        }
-
-        if (nearest !== Infinity) {
-          spreadScore = nearest * 1.5;
-        }
-      }
-
-      const candidateScore =
-        crossings * 4 +
-        edgeCells * 2.2 +
-        centerDistance * 0.12 +
-        spreadScore +
-        Math.random() * 5;
-
-      candidates.push({
-        path,
-        score: candidateScore
-      });
-    }
+  if(n===5){
+    return{
+      maxScans:5,
+      maxCorrect:3
+    };
   }
 
-  candidates.sort((a, b) => b.score - a.score);
-  return candidates;
-}
-
-/* =====================================================
-   UNIQUE-WORD VALIDATION
-===================================================== */
-
-function countWordOccurrences(puzzleBoard, key) {
-  const reverseKey = [...key].reverse().join("");
-  let count = 0;
-
-  for (const direction of CHECK_DIRECTIONS) {
-    const rowDirection = direction[0];
-    const columnDirection = direction[1];
-
-    for (let row = 0; row < ROWS; row++) {
-      for (let column = 0; column < COLS; column++) {
-        const endRow = row + rowDirection * (key.length - 1);
-        const endColumn = column + columnDirection * (key.length - 1);
-
-        if (
-          endRow < 0 ||
-          endRow >= ROWS ||
-          endColumn < 0 ||
-          endColumn >= COLS
-        ) {
-          continue;
-        }
-
-        let text = "";
-
-        for (let index = 0; index < key.length; index++) {
-          text +=
-            puzzleBoard[row + rowDirection * index]
-                       [column + columnDirection * index];
-        }
-
-        if (text === key || text === reverseKey) {
-          count++;
-        }
-      }
-    }
+  if(n===6){
+    return{
+      maxScans:6,
+      maxCorrect:3
+    };
   }
 
-  return count;
-}
-
-function hasExactlyOneOfEachWord(puzzleBoard, puzzle) {
-  for (const word of puzzle.words) {
-    if (countWordOccurrences(puzzleBoard, word.key) !== 1) {
-      return false;
-    }
+  if(n===7){
+    return{
+      maxScans:7,
+      maxCorrect:4
+    };
   }
 
-  return true;
-}
-
-/* =====================================================
-   BOARD SPREAD
-===================================================== */
-
-function usesWholeBoard(nextPlacements) {
-  let minimumRow = ROWS;
-  let maximumRow = -1;
-  let minimumColumn = COLS;
-  let maximumColumn = -1;
-
-  for (const path of nextPlacements.values()) {
-    if (!path) {
-      continue;
-    }
-
-    for (const position of path) {
-      minimumRow = Math.min(minimumRow, position[0]);
-      maximumRow = Math.max(maximumRow, position[0]);
-      minimumColumn = Math.min(minimumColumn, position[1]);
-      maximumColumn = Math.max(maximumColumn, position[1]);
-    }
-  }
-
-  return (
-    minimumRow <= 1 &&
-    maximumRow >= ROWS - 2 &&
-    minimumColumn <= 1 &&
-    maximumColumn >= COLS - 2
-  );
-}
-
-/* =====================================================
-   GENERATE PUZZLE
-===================================================== */
-
-function generatePuzzle() {
-  const puzzle = getCurrentPuzzle();
-
-  const embeddedChildren = new Set(
-    (puzzle.embeddedWords || []).map(item => item.child)
-  );
-
-  const wordsToPlace = puzzle.words
-    .filter(word => !embeddedChildren.has(word.key))
-    .sort((a, b) => b.key.length - a.key.length);
-
-  for (let restart = 0; restart < 600; restart++) {
-    const puzzleBoard = emptyBoard();
-    const nextPlacements = new Map();
-
-    const directionPool = [];
-
-    while (directionPool.length < wordsToPlace.length) {
-      directionPool.push(...shuffle(DIRECTIONS));
-    }
-
-    let successful = true;
-
-    for (let wordIndex = 0; wordIndex < wordsToPlace.length; wordIndex++) {
-      const word = wordsToPlace[wordIndex];
-      const preferredDirection = directionPool[wordIndex];
-
-      const directionsToTry = [
-        preferredDirection,
-        ...shuffle(
-          DIRECTIONS.filter(
-            direction => direction !== preferredDirection
-          )
-        )
-      ];
-
-      let placed = false;
-
-      for (const direction of directionsToTry) {
-        const candidates = getCandidates(
-          word.key,
-          direction,
-          puzzleBoard,
-          nextPlacements
-        );
-
-        if (candidates.length === 0) {
-          continue;
-        }
-
-        const candidateLimit = Math.min(10, candidates.length);
-        const chosen = candidates[randomNumber(candidateLimit)];
-
-        chosen.path.forEach((position, index) => {
-          const row = position[0];
-          const column = position[1];
-          puzzleBoard[row][column] = word.key[index];
-        });
-
-        nextPlacements.set(word.key, chosen.path);
-        placed = true;
-        break;
-      }
-
-      if (!placed) {
-        successful = false;
-        break;
-      }
-    }
-
-    if (!successful) {
-      continue;
-    }
-
-    /* Build any child word that intentionally shares a parent word. */
-    for (const embedded of puzzle.embeddedWords || []) {
-      const parentPath = nextPlacements.get(embedded.parent);
-      const childWord = puzzle.words.find(
-        word => word.key === embedded.child
-      );
-
-      if (!parentPath || !childWord) {
-        successful = false;
-        break;
-      }
-
-      const childPath = parentPath.slice(
-        embedded.start,
-        embedded.start + childWord.key.length
-      );
-
-      if (childPath.length !== childWord.key.length) {
-        successful = false;
-        break;
-      }
-
-      nextPlacements.set(embedded.child, childPath);
-    }
-
-    if (!successful) {
-      continue;
-    }
-
-    if (
-      puzzle.words.some(
-        word => !nextPlacements.has(word.key)
-      )
-    ) {
-      continue;
-    }
-
-    if (!usesWholeBoard(nextPlacements)) {
-      continue;
-    }
-
-    /*
-      Fill blank cells. If the filler accidentally creates
-      another copy of a listed answer, reject it and refill.
-    */
-    for (let fillerAttempt = 0; fillerAttempt < 300; fillerAttempt++) {
-      const filledBoard = puzzleBoard.map(row => [...row]);
-
-      for (let row = 0; row < ROWS; row++) {
-        for (let column = 0; column < COLS; column++) {
-          if (filledBoard[row][column] === "") {
-            filledBoard[row][column] = randomFillerLetter();
-          }
-        }
-      }
-
-      if (hasExactlyOneOfEachWord(filledBoard, puzzle)) {
-        board = filledBoard;
-        placements = nextPlacements;
-        return true;
-      }
-    }
-  }
-
-  return false;
-}
-
-/* =====================================================
-   RENDER
-===================================================== */
-
-function renderGrid() {
-  grid.innerHTML = "";
-
-  for (let row = 0; row < ROWS; row++) {
-    for (let column = 0; column < COLS; column++) {
-      const cell = document.createElement("div");
-      cell.className = "cell";
-      cell.dataset.row = row;
-      cell.dataset.column = column;
-      cell.textContent = board[row][column];
-      grid.appendChild(cell);
-    }
-  }
-}
-
-function renderWordList() {
-  const puzzle = getCurrentPuzzle();
-  wordList.innerHTML = "";
-
-  for (const word of puzzle.words) {
-    const item = document.createElement("div");
-    item.className = "word";
-    item.dataset.key = word.key;
-    item.textContent = word.label;
-
-    if (foundWords.has(word.key)) {
-      item.classList.add("found");
-    }
-
-    wordList.appendChild(item);
-  }
-}
-
-function updatePuzzleInfo() {
-  const puzzle = getCurrentPuzzle();
-  theme.textContent = puzzle.theme;
-  kicker.textContent = puzzle.kicker;
-}
-
-/* =====================================================
-   GRID SELECTION HELPERS
-===================================================== */
-
-function getCellElement(row, column) {
-  return grid.querySelector(
-    '.cell[data-row="' + row + '"][data-column="' + column + '"]'
-  );
-}
-
-function getCellFromPoint(x, y) {
-  const element = document.elementFromPoint(x, y);
-
-  if (!element) {
-    return null;
-  }
-
-  const cell = element.closest(".cell");
-
-  if (!cell || !grid.contains(cell)) {
-    return null;
-  }
-
-  return {
-    row: Number(cell.dataset.row),
-    column: Number(cell.dataset.column)
+  return{
+    maxScans:8,
+    maxCorrect:4
   };
 }
 
-function snappedPath(start, current) {
-  const rowDifference = current.row - start.row;
-  const columnDifference = current.column - start.column;
 
-  if (rowDifference === 0 && columnDifference === 0) {
-    return [start];
-  }
+// ============================================================
+// DOM
+// ============================================================
 
-  const absoluteRow = Math.abs(rowDifference);
-  const absoluteColumn = Math.abs(columnDifference);
+const $=id=>document.getElementById(id);
 
-  let rowStep = 0;
-  let columnStep = 0;
-  let steps = 0;
+const home=$("home");
+const room=$("room");
+const homeError=$("homeError");
 
-  if (absoluteRow > absoluteColumn * 1.7) {
-    rowStep = Math.sign(rowDifference);
-    columnStep = 0;
-    steps = absoluteRow;
-  }
-  else if (absoluteColumn > absoluteRow * 1.7) {
-    rowStep = 0;
-    columnStep = Math.sign(columnDifference);
-    steps = absoluteColumn;
-  }
-  else {
-    rowStep = Math.sign(rowDifference);
-    columnStep = Math.sign(columnDifference);
-    steps = Math.max(absoluteRow, absoluteColumn);
-  }
+const createBtn=$("create");
+const joinBtn=$("join");
+const joinCode=$("joinCode");
 
-  const path = [];
+const roleEl=$("role");
+const roomCodeEl=$("roomCode");
+const connection=$("connection");
 
-  for (let index = 0; index <= steps; index++) {
-    const row = start.row + rowStep * index;
-    const column = start.column + columnStep * index;
+const copyCode=$("copyCode");
+const copyLink=$("copyLink");
+const leave=$("leave");
 
-    if (
-      row < 0 ||
-      row >= ROWS ||
-      column < 0 ||
-      column >= COLS
-    ) {
-      break;
-    }
+const hostPanel=$("hostPanel");
+const hostSetup=$("hostSetup");
+const hostActive=$("hostActive");
 
-    path.push({ row, column });
-  }
+const secretInput=$("secret");
+const showBtn=$("show");
+const startBtn=$("start");
+const newWord=$("newWord");
 
-  return path;
+const hostLen=$("hostLen");
+
+const game=$("game");
+const guesser=$("guesser");
+const hostWatch=$("hostWatch");
+
+const lenStat=$("lenStat");
+const scanStat=$("scanStat");
+const correctStat=$("correctStat");
+const guessStat=$("guessStat");
+
+const rulesEl=$("rules");
+const message=$("message");
+
+const keyboard=$("keyboard");
+const learned=$("learned");
+const hostLearned=$("hostLearned");
+
+const guessArea=$("guessArea");
+const wordGuess=$("wordGuess");
+const commitText=$("commitText");
+
+const historySection=$("historySection");
+const historyEl=$("history");
+
+
+// ============================================================
+// MULTIPLAYER STATE
+// ============================================================
+
+const ROOM_CHARS=
+  "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
+
+const PREFIX="ghostword-";
+
+let role=null;
+
+let roomCode="";
+
+let peer=null;
+
+let conn=null;
+
+// This exists ONLY on the host browser.
+let secretWord="";
+
+let pending=false;
+
+let pendingId="";
+
+let generation=0;
+
+let state=lobbyState();
+
+
+// ============================================================
+// BASIC HELPERS
+// ============================================================
+
+function lobbyState(){
+
+  return{
+
+    phase:"lobby",
+
+    wordLength:0,
+
+    maxScans:0,
+
+    maxCorrect:0,
+
+    roundScans:0,
+
+    roundCorrect:0,
+
+    wordGuesses:0,
+
+    guessedLetters:{},
+
+    guesses:[],
+
+    message:
+      "Host is choosing the secret word.",
+
+    ackId:"",
+
+    version:0
+
+  };
+
 }
 
-/* =====================================================
-   PREVIEW
-===================================================== */
 
-function clearPreview() {
-  grid
-    .querySelectorAll(".cell.preview")
-    .forEach(cell => cell.classList.remove("preview"));
+function cleanWord(v,max=16){
+
+  return String(v||"")
+    .toUpperCase()
+    .replace(/[^A-Z]/g,"")
+    .slice(0,max);
+
 }
 
-function showPreview(path) {
-  clearPreview();
-  currentPath = path;
 
-  for (const position of path) {
-    const cell = getCellElement(position.row, position.column);
+function cleanCode(v){
 
-    if (cell && !cell.classList.contains("found")) {
-      cell.classList.add("preview");
-    }
-  }
+  return String(v||"")
+    .toUpperCase()
+    .replace(/[^A-Z0-9]/g,"")
+    .slice(0,6);
+
 }
 
-/* =====================================================
-   MATCH WORD
-===================================================== */
 
-function samePath(selectedPath, correctPath) {
-  if (selectedPath.length !== correctPath.length) {
-    return false;
-  }
+function newCode(){
 
-  for (let index = 0; index < selectedPath.length; index++) {
-    if (
-      selectedPath[index].row !== correctPath[index][0] ||
-      selectedPath[index].column !== correctPath[index][1]
-    ) {
-      return false;
-    }
-  }
+  const a=new Uint32Array(6);
 
-  return true;
+  crypto.getRandomValues(a);
+
+  return Array
+    .from(
+      a,
+      n=>ROOM_CHARS[n%ROOM_CHARS.length]
+    )
+    .join("");
+
 }
 
-function findMatchingWord(path) {
-  const puzzle = getCurrentPuzzle();
 
-  for (const word of puzzle.words) {
-    if (foundWords.has(word.key)) {
-      continue;
-    }
+function peerId(code){
 
-    const correctPath = placements.get(word.key);
+  return PREFIX+code.toLowerCase();
 
-    if (!correctPath) {
-      continue;
-    }
-
-    if (samePath(path, correctPath)) {
-      return word;
-    }
-
-    const backwards = [...correctPath].reverse();
-
-    if (samePath(path, backwards)) {
-      return word;
-    }
-  }
-
-  return null;
 }
 
-function paintWordYellow(path) {
-  for (const position of path) {
-    const cell = getCellElement(position.row, position.column);
 
-    if (cell) {
-      cell.classList.add("found");
-    }
-  }
+function actionId(){
+
+  return crypto.randomUUID
+    ? crypto.randomUUID()
+    : Date.now().toString(36)
+      +Math.random().toString(36).slice(2);
+
 }
 
-/* =====================================================
-   SCORE
-===================================================== */
 
-function updateScore() {
-  const puzzle = getCurrentPuzzle();
-  const total = puzzle.words.length;
+function cloneState(){
 
-  score.textContent = foundWords.size + " / " + total;
-
-  if (foundWords.size === total) {
-    win.textContent = puzzle.winMessage;
-    win.classList.add("show");
-    message.textContent = "You found them all. \u{1F525}";
-    message.className = "good";
-  }
-  else {
-    win.classList.remove("show");
-  }
-}
-
-/* =====================================================
-   FINISH SELECTION
-===================================================== */
-
-function finishSelection() {
-  const puzzle = getCurrentPuzzle();
-  const total = puzzle.words.length;
-
-  if (foundWords.size === total) {
-    clearPreview();
-    return;
-  }
-
-  if (currentPath.length === 0) {
-    return;
-  }
-
-  const matchedWord = findMatchingWord(currentPath);
-  clearPreview();
-
-  if (matchedWord) {
-    foundWords.add(matchedWord.key);
-    paintWordYellow(currentPath);
-    renderWordList();
-    updateScore();
-
-    if (foundWords.size !== total) {
-      message.textContent =
-        matchedWord.label + " found! " + puzzle.foundEmoji;
-      message.className = "good";
-    }
-  }
-  else {
-    message.textContent = "Nope. Keep looking. \u{1F60E}";
-    message.className = "";
-  }
-
-  currentPath = [];
-  startCell = null;
-}
-
-/* =====================================================
-   DRAGGING
-===================================================== */
-
-function startDrag(x, y) {
-  const total = getCurrentPuzzle().words.length;
-
-  if (foundWords.size === total) {
-    return false;
-  }
-
-  const cell = getCellFromPoint(x, y);
-
-  if (!cell) {
-    return false;
-  }
-
-  dragging = true;
-  startCell = cell;
-  showPreview([cell]);
-  return true;
-}
-
-function moveDrag(x, y) {
-  if (!dragging || !startCell) {
-    return;
-  }
-
-  const cell = getCellFromPoint(x, y);
-
-  if (!cell) {
-    return;
-  }
-
-  showPreview(snappedPath(startCell, cell));
-}
-
-function endDrag() {
-  if (!dragging) {
-    return;
-  }
-
-  dragging = false;
-  finishSelection();
-}
-
-/* =====================================================
-   TOUCH
-===================================================== */
-
-grid.addEventListener(
-  "touchstart",
-  event => {
-    if (event.changedTouches.length === 0) {
-      return;
-    }
-
-    event.preventDefault();
-    const touch = event.changedTouches[0];
-    activeTouchID = touch.identifier;
-    startDrag(touch.clientX, touch.clientY);
-  },
-  { passive: false }
-);
-
-grid.addEventListener(
-  "touchmove",
-  event => {
-    if (!dragging) {
-      return;
-    }
-
-    event.preventDefault();
-    let touch = null;
-
-    for (const possibleTouch of event.touches) {
-      if (possibleTouch.identifier === activeTouchID) {
-        touch = possibleTouch;
-        break;
-      }
-    }
-
-    if (!touch) {
-      return;
-    }
-
-    moveDrag(touch.clientX, touch.clientY);
-  },
-  { passive: false }
-);
-
-grid.addEventListener(
-  "touchend",
-  event => {
-    event.preventDefault();
-    endDrag();
-    activeTouchID = null;
-  },
-  { passive: false }
-);
-
-grid.addEventListener(
-  "touchcancel",
-  event => {
-    event.preventDefault();
-    dragging = false;
-    activeTouchID = null;
-    currentPath = [];
-    startCell = null;
-    clearPreview();
-  },
-  { passive: false }
-);
-
-/* =====================================================
-   MOUSE
-===================================================== */
-
-grid.addEventListener("mousedown", event => {
-  event.preventDefault();
-  startDrag(event.clientX, event.clientY);
-});
-
-window.addEventListener("mousemove", event => {
-  if (!dragging) {
-    return;
-  }
-
-  moveDrag(event.clientX, event.clientY);
-});
-
-window.addEventListener("mouseup", () => {
-  endDrag();
-});
-
-/* =====================================================
-   BOARD CONTROLS
-===================================================== */
-
-function loadNewBoard() {
-  foundWords.clear();
-  win.classList.remove("show");
-  message.textContent = "Scrambling a new board...";
-  message.className = "";
-
-  const success = generatePuzzle();
-
-  if (!success) {
-    message.textContent = "Couldn't build one. Tap Shuffle Board again.";
-    return;
-  }
-
-  renderGrid();
-  renderWordList();
-  updatePuzzleInfo();
-  updateScore();
-  message.textContent = "Good luck. \u{1F50E}";
-  message.className = "";
-}
-
-resetButton.addEventListener("click", () => {
-  foundWords.clear();
-  renderGrid();
-  renderWordList();
-  updateScore();
-  message.textContent = "Same board. Start over. \u{1F50E}";
-  message.className = "";
-});
-
-newPuzzleButton.addEventListener("click", () => {
-  loadNewBoard();
-});
-
-categorySelect.addEventListener("change", () => {
-  const selectedID = categorySelect.value;
-  const nextIndex = PUZZLES.findIndex(
-    puzzle => puzzle.id === selectedID
+  return JSON.parse(
+    JSON.stringify(state)
   );
 
-  if (nextIndex === -1) {
+}
+
+
+function setError(t){
+
+  homeError.textContent=t;
+
+  homeError.classList.remove("hidden");
+
+}
+
+
+function clearError(){
+
+  homeError.classList.add("hidden");
+
+  homeError.textContent="";
+
+}
+
+
+function setConn(t,on=false){
+
+  connection.innerHTML=
+    `<span class="dot ${on?"online":""}"></span>${t}`;
+
+}
+
+
+function send(c,data){
+
+  try{
+
+    if(c && c.open){
+
+      c.send(data);
+
+      return true;
+
+    }
+
+  }
+  catch(e){}
+
+  return false;
+
+}
+
+
+function errText(e){
+
+  if(e?.type==="peer-unavailable"){
+
+    return "Room not found. Check the code and make sure the host still has the page open.";
+
+  }
+
+  if(e?.type==="browser-incompatible"){
+
+    return "This browser does not support the WebRTC features needed for multiplayer.";
+
+  }
+
+  return "Multiplayer connection error"
+    +(e?.message ? ": "+e.message : "");
+
+}
+
+
+// ============================================================
+// BUILD ALPHABET
+// ============================================================
+
+"ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+.split("")
+.forEach(letter=>{
+
+  const b=document.createElement("button");
+
+  b.className="key";
+
+  b.type="button";
+
+  b.dataset.letter=letter;
+
+  b.textContent=letter;
+
+  b.addEventListener(
+    "click",
+    ()=>{
+
+      if(!b.disabled){
+
+        sendAction(
+          "scan",
+          letter
+        );
+
+      }
+
+    }
+  );
+
+  keyboard.appendChild(b);
+
+});
+
+
+const keys=[
+  ...document.querySelectorAll(".key")
+];
+
+
+// ============================================================
+// ROOM UI
+// ============================================================
+
+function openRoom(){
+
+  home.classList.add("hidden");
+
+  room.classList.remove("hidden");
+
+  roomCodeEl.textContent=
+    roomCode;
+
+  roleEl.textContent=
+    role==="host"
+      ? "YOU ARE THE HOST"
+      : "YOU ARE THE GUESSER";
+
+  hostPanel.classList.toggle(
+    "hidden",
+    role!=="host"
+  );
+
+  const u=
+    new URL(location.href);
+
+  u.searchParams.set(
+    "room",
+    roomCode
+  );
+
+  window.history.replaceState(
+    null,
+    "",
+    u
+  );
+
+  render();
+
+}
+
+
+function goHome(){
+
+  generation++;
+
+  try{
+    conn?.close();
+  }
+  catch(e){}
+
+  try{
+    peer?.destroy();
+  }
+  catch(e){}
+
+  role=null;
+
+  roomCode="";
+
+  peer=null;
+
+  conn=null;
+
+  secretWord="";
+
+  pending=false;
+
+  pendingId="";
+
+  state=lobbyState();
+
+  room.classList.add("hidden");
+
+  home.classList.remove("hidden");
+
+  createBtn.disabled=false;
+
+  joinBtn.disabled=false;
+
+  secretInput.value="";
+
+  wordGuess.value="";
+
+  const u=
+    new URL(location.href);
+
+  u.searchParams.delete("room");
+
+  window.history.replaceState(
+    null,
+    "",
+    u
+  );
+
+  render();
+
+}
+
+
+// ============================================================
+// HOST CREATES ROOM
+// ============================================================
+
+function createRoom(){
+
+  clearError();
+
+  if(typeof Peer==="undefined"){
+
+    setError(
+      "PeerJS did not load. Check your internet connection and reload."
+    );
+
+    return;
+
+  }
+
+  createBtn.disabled=true;
+
+  joinBtn.disabled=true;
+
+  role="host";
+
+  state=lobbyState();
+
+  secretWord="";
+
+  createHost(
+    ++generation,
+    0
+  );
+
+}
+
+
+function createHost(gen,attempt){
+
+  if(gen!==generation){
     return;
   }
 
-  currentPuzzleIndex = nextIndex;
-  loadNewBoard();
-});
+  if(attempt>=10){
 
-/* =====================================================
-   START
-===================================================== */
+    setError(
+      "Could not create a unique room code. Try again."
+    );
 
-categorySelect.value = PUZZLES[currentPuzzleIndex].id;
-updatePuzzleInfo();
-loadNewBoard();
+    createBtn.disabled=false;
+
+    joinBtn.disabled=false;
+
+    return;
+
+  }
+
+  roomCode=newCode();
+
+  let opened=false;
+
+  peer=
+    new Peer(
+      peerId(roomCode),
+      {
+        debug:1
+      }
+    );
+
+
+  peer.on(
+    "open",
+    ()=>{
+
+      if(gen!==generation){
+        return;
+      }
+
+      opened=true;
+
+      openRoom();
+
+      setConn(
+        "Room created. Waiting for your friend to join..."
+      );
+
+    }
+  );
+
+
+  peer.on(
+    "connection",
+    c=>{
+
+      if(gen!==generation){
+
+        c.close();
+
+        return;
+
+      }
+
+      if(conn && conn.open){
+
+        c.on(
+          "open",
+          ()=>{
+
+            send(
+              c,
+              {
+                type:"room-full"
+              }
+            );
+
+            setTimeout(
+              ()=>c.close(),
+              100
+            );
+
+          }
+        );
+
+        return;
+
+      }
+
+      conn=c;
+
+      attachHostConn(
+        c,
+        gen
+      );
+
+    }
+  );
+
+
+  peer.on(
+    "error",
+    e=>{
+
+      if(gen!==generation){
+        return;
+      }
+
+      if(
+        !opened &&
+        e?.type==="unavailable-id"
+      ){
+
+        try{
+          peer.destroy();
+        }
+        catch(_){}
+
+        createHost(
+          gen,
+          attempt+1
+        );
+
+        return;
+
+      }
+
+      if(
+        room.classList.contains("hidden")
+      ){
+
+        setError(
+          errText(e)
+        );
+
+        createBtn.disabled=false;
+
+        joinBtn.disabled=false;
+
+      }
+      else{
+
+        setConn(
+          errText(e)
+        );
+
+      }
+
+    }
+  );
+
+
+  peer.on(
+    "disconnected",
+    ()=>{
+
+      if(
+        gen===generation &&
+        !peer.destroyed
+      ){
+
+        try{
+          peer.reconnect();
+        }
+        catch(_){}
+
+      }
+
+    }
+  );
+
+}
+
+
+function attachHostConn(c,gen){
+
+  c.on(
+    "open",
+    ()=>{
+
+      if(gen!==generation){
+        return;
+      }
+
+      setConn(
+        "Friend connected. You can play.",
+        true
+      );
+
+      send(
+        c,
+        {
+          type:"welcome",
+          state:cloneState()
+        }
+      );
+
+    }
+  );
+
+
+  c.on(
+    "data",
+    d=>{
+
+      if(gen===generation){
+
+        handleHostData(d);
+
+      }
+
+    }
+  );
+
+
+  c.on(
+    "close",
+    ()=>{
+
+      if(
+        gen===generation &&
+        conn===c
+      ){
+
+        conn=null;
+
+        setConn(
+          "Friend disconnected. They can rejoin with the same code."
+        );
+
+      }
+
+    }
+  );
+
+
+  c.on(
+    "error",
+    ()=>{
+
+      if(gen===generation){
+
+        setConn(
+          "Connection problem. Your friend can reconnect with the same room code."
+        );
+
+      }
+
+    }
+  );
+
+}
+
+
+// ============================================================
+// GUESSER JOINS ROOM
+// ============================================================
+
+function joinRoom(){
+
+  clearError();
+
+  if(typeof Peer==="undefined"){
+
+    setError(
+      "PeerJS did not load. Check your internet connection and reload."
+    );
+
+    return;
+
+  }
+
+  const code=
+    cleanCode(
+      joinCode.value
+    );
+
+  if(code.length!==6){
+
+    setError(
+      "Enter the six-character room code."
+    );
+
+    return;
+
+  }
+
+  role="guesser";
+
+  roomCode=code;
+
+  createBtn.disabled=true;
+
+  joinBtn.disabled=true;
+
+  const gen=
+    ++generation;
+
+
+  peer=
+    new Peer(
+      undefined,
+      {
+        debug:1
+      }
+    );
+
+
+  peer.on(
+    "open",
+    ()=>{
+
+      if(gen!==generation){
+        return;
+      }
+
+      openRoom();
+
+      setConn(
+        "Connecting to room "
+        +roomCode
+        +"..."
+      );
+
+      conn=
+        peer.connect(
+          peerId(roomCode),
+          {
+            reliable:true,
+            serialization:"json"
+          }
+        );
+
+      attachGuestConn(
+        conn,
+        gen
+      );
+
+    }
+  );
+
+
+  peer.on(
+    "error",
+    e=>{
+
+      if(gen===generation){
+
+        setConn(
+          errText(e)
+        );
+
+      }
+
+    }
+  );
+
+
+  peer.on(
+    "disconnected",
+    ()=>{
+
+      if(
+        gen===generation &&
+        !peer.destroyed
+      ){
+
+        try{
+          peer.reconnect();
+        }
+        catch(_){}
+
+      }
+
+    }
+  );
+
+}
+
+
+function attachGuestConn(c,gen){
+
+  c.on(
+    "open",
+    ()=>{
+
+      if(gen===generation){
+
+        setConn(
+          "Connected to host.",
+          true
+        );
+
+      }
+
+    }
+  );
+
+
+  c.on(
+    "data",
+    d=>{
+
+      if(gen===generation){
+
+        handleGuestData(d);
+
+      }
+
+    }
+  );
+
+
+  c.on(
+    "close",
+    ()=>{
+
+      if(gen===generation){
+
+        pending=false;
+
+        pendingId="";
+
+        setConn(
+          "Disconnected from host. Leave and rejoin to reconnect."
+        );
+
+        render();
+
+      }
+
+    }
+  );
+
+
+  c.on(
+    "error",
+    ()=>{
+
+      if(gen===generation){
+
+        setConn(
+          "Could not connect to that room."
+        );
+
+      }
+
+    }
+  );
+
+}
+
+
+// ============================================================
+// HOST STARTS GAME
+// ============================================================
+
+function startGame(){
+
+  if(role!=="host"){
+    return;
+  }
+
+  const w=
+    cleanWord(
+      secretInput.value
+    );
+
+  if(w.length<4){
+
+    alert(
+      "Use a secret word with at least 4 letters."
+    );
+
+    return;
+
+  }
+
+  secretWord=w;
+
+  const r=
+    getRules(
+      w.length
+    );
+
+  state={
+
+    phase:"scanning",
+
+    wordLength:w.length,
+
+    maxScans:r.maxScans,
+
+    maxCorrect:r.maxCorrect,
+
+    roundScans:0,
+
+    roundCorrect:0,
+
+    wordGuesses:0,
+
+    guessedLetters:{},
+
+    guesses:[],
+
+    message:
+      `Scan letters. After ${r.maxScans} scans or ${r.maxCorrect} correct letters, you must make one word guess.`,
+
+    ackId:"",
+
+    version:
+      (state.version||0)+1
+
+  };
+
+  secretInput.value="";
+
+  broadcast();
+
+  render();
+
+}
+
+
+function resetWord(){
+
+  if(role!=="host"){
+    return;
+  }
+
+  secretWord="";
+
+  state=lobbyState();
+
+  state.version++;
+
+  broadcast();
+
+  render();
+
+  setTimeout(
+    ()=>secretInput.focus(),
+    0
+  );
+
+}
+
+
+// ============================================================
+// HOST GAME ENGINE
+// ============================================================
+
+function handleHostData(d){
+
+  if(
+    !d ||
+    d.type!=="action" ||
+    !d.action
+  ){
+    return;
+  }
+
+  const a=d.action;
+
+  if(a.kind==="scan"){
+
+    processScan(a);
+
+  }
+
+  if(a.kind==="word"){
+
+    processWord(a);
+
+  }
+
+}
+
+
+function processScan(a){
+
+  const id=
+    String(
+      a.id||""
+    );
+
+  if(
+    !secretWord ||
+    state.phase!=="scanning"
+  ){
+
+    ack(id);
+
+    return;
+
+  }
+
+  const letter=
+    cleanWord(
+      a.value,
+      1
+    );
+
+  if(
+    !/^[A-Z]$/.test(letter) ||
+    Object.prototype.hasOwnProperty.call(
+      state.guessedLetters,
+      letter
+    )
+  ){
+
+    ack(id);
+
+    return;
+
+  }
+
+  const correct=
+    secretWord.includes(letter);
+
+  state.guessedLetters[letter]=
+    correct;
+
+  state.roundScans++;
+
+  if(correct){
+
+    state.roundCorrect++;
+
+  }
+
+  const noLettersLeft=
+    Object.keys(
+      state.guessedLetters
+    ).length>=26;
+
+  const force=
+    state.roundScans>=state.maxScans ||
+    state.roundCorrect>=state.maxCorrect ||
+    noLettersLeft;
+
+  if(force){
+
+    state.phase="guess";
+
+    state.message=
+      `Scan phase over. Make one ${state.wordLength}-letter word guess.`;
+
+  }
+  else{
+
+    state.message=
+      correct
+        ? `${letter} is in the Ghost Word.`
+        : `${letter} is not in the Ghost Word.`;
+
+  }
+
+  state.ackId=id;
+
+  state.version++;
+
+  broadcast();
+
+  render();
+
+}
+
+
+function processWord(a){
+
+  const id=
+    String(
+      a.id||""
+    );
+
+  if(
+    !secretWord ||
+    state.phase!=="guess"
+  ){
+
+    ack(id);
+
+    return;
+
+  }
+
+  const guess=
+    cleanWord(
+      a.value,
+      state.wordLength
+    );
+
+  if(
+    guess.length!==state.wordLength
+  ){
+
+    ack(id);
+
+    return;
+
+  }
+
+  const correct=
+    guess===secretWord;
+
+  state.wordGuesses++;
+
+  state.guesses.push({
+    word:guess,
+    correct:correct
+  });
+
+
+  if(correct){
+
+    state.phase="won";
+
+    state.message=
+      "Correct! You found the Ghost Word!";
+
+  }
+  else{
+
+    // One full-word attempt only.
+    // Wrong guess sends them straight back to scanning.
+
+    state.phase="scanning";
+
+    state.roundScans=0;
+
+    state.roundCorrect=0;
+
+    state.message=
+      "Wrong — keep scanning.";
+
+  }
+
+  state.ackId=id;
+
+  state.version++;
+
+  broadcast();
+
+  render();
+
+}
+
+
+function ack(id){
+
+  state.ackId=id;
+
+  state.version++;
+
+  broadcast();
+
+  render();
+
+}
+
+
+function broadcast(){
+
+  if(
+    role==="host" &&
+    conn?.open
+  ){
+
+    send(
+      conn,
+      {
+        type:"state",
+        state:cloneState()
+      }
+    );
+
+  }
+
+}
+
+
+// ============================================================
+// GUESSER SENDS ACTION
+// ============================================================
+
+function sendAction(kind,value){
+
+  if(
+    role!=="guesser" ||
+    pending ||
+    !conn?.open
+  ){
+    return;
+  }
+
+  pending=true;
+
+  pendingId=
+    actionId();
+
+  render();
+
+  send(
+    conn,
+    {
+      type:"action",
+
+      action:{
+        id:pendingId,
+        kind:kind,
+        value:value
+      }
+
+    }
+  );
+
+}
+
+
+function handleGuestData(d){
+
+  if(
+    !d ||
+    typeof d!=="object"
+  ){
+    return;
+  }
+
+  if(d.type==="room-full"){
+
+    setConn(
+      "That room already has two players."
+    );
+
+    try{
+      conn.close();
+    }
+    catch(_){}
+
+    return;
+
+  }
+
+  if(
+    (
+      d.type==="welcome" ||
+      d.type==="state"
+    )
+    &&
+    d.state
+  ){
+
+    state=d.state;
+
+    if(
+      pendingId &&
+      state.ackId===pendingId
+    ){
+
+      pending=false;
+
+      pendingId="";
+
+    }
+
+    render();
+
+  }
+
+}
+
+
+// ============================================================
+// RENDER GAME
+// ============================================================
+
+function render(){
+
+  const started=
+    state.wordLength>0;
+
+
+  if(role==="host"){
+
+    hostPanel.classList.remove(
+      "hidden"
+    );
+
+    hostSetup.classList.toggle(
+      "hidden",
+      started
+    );
+
+    hostActive.classList.toggle(
+      "hidden",
+      !started
+    );
+
+    hostLen.textContent=
+      started
+        ? state.wordLength
+        : "—";
+
+  }
+
+
+  game.classList.toggle(
+    "hidden",
+    !started
+  );
+
+
+  if(!started){
+    return;
+  }
+
+
+  guesser.classList.toggle(
+    "hidden",
+    role!=="guesser"
+  );
+
+
+  hostWatch.classList.toggle(
+    "hidden",
+    role!=="host"
+  );
+
+
+  lenStat.textContent=
+    state.wordLength;
+
+
+  scanStat.textContent=
+    `${state.roundScans} / ${state.maxScans}`;
+
+
+  correctStat.textContent=
+    `${state.roundCorrect} / ${state.maxCorrect}`;
+
+
+  guessStat.textContent=
+    state.wordGuesses;
+
+
+  rulesEl.textContent=
+    `${state.wordLength}-letter word • ${state.maxScans} scans OR ${state.maxCorrect} correct letters before each forced word guess.`;
+
+
+  message.textContent=
+    state.message||"";
+
+
+  message.className=
+    "status";
+
+
+  if(state.phase==="guess"){
+
+    message.classList.add(
+      "force"
+    );
+
+  }
+  else if(state.phase==="won"){
+
+    message.classList.add(
+      "good"
+    );
+
+  }
+  else if(
+    (state.message||"")
+    .startsWith("Wrong")
+  ){
+
+    message.classList.add(
+      "bad"
+    );
+
+  }
+
+
+  renderLetters();
+
+  renderGuess();
+
+  renderHistory();
+
+}
+
+
+// ============================================================
+// RENDER LETTERS
+// ============================================================
+
+function renderLetters(){
+
+  const g=
+    state.guessedLetters||{};
+
+
+  keys.forEach(k=>{
+
+    const l=
+      k.dataset.letter;
+
+    const tried=
+      Object.prototype.hasOwnProperty.call(
+        g,
+        l
+      );
+
+
+    k.classList.remove(
+      "good",
+      "bad"
+    );
+
+
+    if(tried){
+
+      k.classList.add(
+        g[l]
+          ? "good"
+          : "bad"
+      );
+
+    }
+
+
+    k.disabled=
+      role!=="guesser" ||
+      state.phase!=="scanning" ||
+      pending ||
+      tried ||
+      !conn?.open;
+
+  });
+
+
+  fillLetters(
+    learned,
+    g
+  );
+
+
+  fillLetters(
+    hostLearned,
+    g
+  );
+
+}
+
+
+function fillLetters(el,g){
+
+  el.innerHTML="";
+
+
+  const entries=
+    Object.entries(g)
+    .sort(
+      (a,b)=>
+        a[0].localeCompare(b[0])
+    );
+
+
+  if(!entries.length){
+
+    el.innerHTML=
+      '<span class="small">No letters scanned yet.</span>';
+
+    return;
+
+  }
+
+
+  entries.forEach(
+    ([l,c])=>{
+
+      const p=
+        document.createElement("span");
+
+      p.className=
+        "pill "
+        +(c?"good":"bad");
+
+      p.textContent=
+        l
+        +" "
+        +(c?"✅":"❌");
+
+      el.appendChild(p);
+
+    }
+  );
+
+}
+
+
+// ============================================================
+// RENDER WORD GUESS
+// ============================================================
+
+function renderGuess(){
+
+  if(role!=="guesser"){
+    return;
+  }
+
+
+  const on=
+    state.phase==="guess";
+
+
+  guessArea.classList.toggle(
+    "hidden",
+    !on
+  );
+
+
+  if(!on){
+
+    wordGuess.value="";
+
+    wordGuess.disabled=true;
+
+    return;
+
+  }
+
+
+  wordGuess.maxLength=
+    state.wordLength;
+
+
+  wordGuess.placeholder=
+    `TYPE ${state.wordLength} LETTERS`;
+
+
+  wordGuess.disabled=
+    pending ||
+    !conn?.open;
+
+
+  commitText.textContent=
+    `The instant you enter letter #${state.wordLength}, the guess is committed. You cannot edit it afterward.`;
+
+
+  if(
+    !wordGuess.disabled &&
+    document.activeElement!==wordGuess
+  ){
+
+    setTimeout(
+      ()=>{
+
+        if(
+          state.phase==="guess" &&
+          !wordGuess.disabled
+        ){
+
+          wordGuess.focus();
+
+        }
+
+      },
+      50
+    );
+
+  }
+
+}
+
+
+// ============================================================
+// RENDER WORD GUESS HISTORY
+// ============================================================
+
+function renderHistory(){
+
+  const a=
+    state.guesses||[];
+
+
+  historySection.classList.toggle(
+    "hidden",
+    !a.length
+  );
+
+
+  historyEl.innerHTML="";
+
+
+  [...a]
+  .reverse()
+  .forEach(x=>{
+
+    const r=
+      document.createElement("div");
+
+    r.className=
+      "history-row";
+
+
+    const word=
+      document.createElement("strong");
+
+    word.textContent=
+      x.word;
+
+
+    const result=
+      document.createElement("span");
+
+    result.style.fontWeight=
+      "800";
+
+
+    result.style.color=
+      x.correct
+        ? "#98ffc0"
+        : "#ffb2bf";
+
+
+    result.textContent=
+      x.correct
+        ? "✅ CORRECT"
+        : "❌ WRONG";
+
+
+    r.appendChild(word);
+
+    r.appendChild(result);
+
+    historyEl.appendChild(r);
+
+  });
+
+}
+
+
+// ============================================================
+// BUTTON EVENTS
+// ============================================================
+
+createBtn.addEventListener(
+  "click",
+  createRoom
+);
+
+
+joinBtn.addEventListener(
+  "click",
+  joinRoom
+);
+
+
+joinCode.addEventListener(
+  "input",
+  ()=>{
+
+    joinCode.value=
+      cleanCode(
+        joinCode.value
+      );
+
+  }
+);
+
+
+joinCode.addEventListener(
+  "keydown",
+  e=>{
+
+    if(e.key==="Enter"){
+
+      joinRoom();
+
+    }
+
+  }
+);
+
+
+secretInput.addEventListener(
+  "input",
+  ()=>{
+
+    secretInput.value=
+      cleanWord(
+        secretInput.value
+      );
+
+  }
+);
+
+
+secretInput.addEventListener(
+  "keydown",
+  e=>{
+
+    if(e.key==="Enter"){
+
+      startGame();
+
+    }
+
+  }
+);
+
+
+showBtn.addEventListener(
+  "click",
+  ()=>{
+
+    const showing=
+      secretInput.type==="text";
+
+
+    secretInput.type=
+      showing
+        ? "password"
+        : "text";
+
+
+    showBtn.textContent=
+      showing
+        ? "SHOW"
+        : "HIDE";
+
+  }
+);
+
+
+startBtn.addEventListener(
+  "click",
+  startGame
+);
+
+
+newWord.addEventListener(
+  "click",
+  resetWord
+);
+
+
+leave.addEventListener(
+  "click",
+  goHome
+);
+
+
+// ============================================================
+// AUTOMATIC WORD-GUESS COMMIT
+// ============================================================
+
+wordGuess.addEventListener(
+  "input",
+  ()=>{
+
+    if(
+      role!=="guesser" ||
+      state.phase!=="guess" ||
+      pending
+    ){
+      return;
+    }
+
+
+    const needed=
+      state.wordLength;
+
+
+    const cleaned=
+      cleanWord(
+        wordGuess.value,
+        needed
+      );
+
+
+    if(
+      wordGuess.value!==cleaned
+    ){
+
+      wordGuess.value=
+        cleaned;
+
+    }
+
+
+    // The exact moment the final required letter
+    // is entered, the guess is committed.
+
+    if(
+      cleaned.length===needed
+    ){
+
+      wordGuess.disabled=true;
+
+
+      sendAction(
+        "word",
+        cleaned
+      );
+
+
+      wordGuess.value="";
+
+    }
+
+  }
+);
+
+
+// ============================================================
+// COPY ROOM CODE / INVITE LINK
+// ============================================================
+
+async function copy(t){
+
+  try{
+
+    await navigator.clipboard.writeText(t);
+
+    return true;
+
+  }
+  catch(e){
+
+    return false;
+
+  }
+
+}
+
+
+copyCode.addEventListener(
+  "click",
+  async()=>{
+
+    const old=
+      copyCode.textContent;
+
+
+    const worked=
+      await copy(roomCode);
+
+
+    copyCode.textContent=
+      worked
+        ? "COPIED!"
+        : roomCode;
+
+
+    setTimeout(
+      ()=>copyCode.textContent=old,
+      1000
+    );
+
+  }
+);
+
+
+copyLink.addEventListener(
+  "click",
+  async()=>{
+
+    const u=
+      new URL(location.href);
+
+
+    u.searchParams.set(
+      "room",
+      roomCode
+    );
+
+
+    const old=
+      copyLink.textContent;
+
+
+    const worked=
+      await copy(
+        u.toString()
+      );
+
+
+    copyLink.textContent=
+      worked
+        ? "COPIED!"
+        : "COPY FAILED";
+
+
+    setTimeout(
+      ()=>copyLink.textContent=old,
+      1000
+    );
+
+  }
+);
+
+
+// ============================================================
+// CLOSE CONNECTION WHEN PAGE CLOSES
+// ============================================================
+
+window.addEventListener(
+  "beforeunload",
+  ()=>{
+
+    try{
+
+      conn?.close();
+
+      peer?.destroy();
+
+    }
+    catch(e){}
+
+  }
+);
+
+
+// ============================================================
+// INVITE LINKS
+//
+// Example:
+//
+// https://yourname.github.io/ghostword/?room=ABC123
+//
+// This automatically fills in ABC123.
+// ============================================================
+
+const invite=
+  cleanCode(
+    new URL(location.href)
+    .searchParams
+    .get("room")
+    ||""
+  );
+
+
+if(invite.length===6){
+
+  joinCode.value=
+    invite;
+
+}
+
+
+render();
 
 })();
 </script>
